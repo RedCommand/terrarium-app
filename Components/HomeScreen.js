@@ -5,9 +5,9 @@ import films from '../Data/Data';
 
 const filmItem = (item) => (
     <View style={styles.films_container}>
-        <View style={styles.image_container}>
-            <Image source={{ uri: "image" }} />
-        </View>
+
+        <Image style={styles.image_container} source={{ uri: item.poster_uri }} />
+
         <View style={styles.films_header_container}>
             <View style={styles.films_title}>
                 <Text style={{ flex: 6, paddingRight: 5 }}>{item.title}</Text>
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     image_container: {
         width: 120,
         height: 180,
-        backgroundColor: 'blue'
+        //backgroundColor: 'blue'
     },
 
     films_header_container: {

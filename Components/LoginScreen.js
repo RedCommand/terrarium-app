@@ -1,28 +1,10 @@
 import React from 'react';
 import { SafeAreaView, StyleSheet, View, Text, Button, TextInput } from 'react-native';
-
+import axios from 'axios';
 
 function LoginScreen({ navigation }) {
     const [username, OnUsernameChange] = React.useState(null);
     const [password, OnPasswordChange] = React.useState(null);
-
-    const getDevices = () => {
-        try {
-            let response = fetch(
-                'http://senard.freeboxos.fr:4000/client/bmluaWU6Om5pbmllMTIxMiE=/list_devices'
-            );
-
-            <View>
-                <Text>test = {response}</Text>
-            </View>
-
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const [value, setValue] = React.useState(null);
-    const incrementValue = () => setValue(getDevices);
 
     return (
         <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -43,10 +25,13 @@ function LoginScreen({ navigation }) {
                 onPress={() => navigation.navigate('Home')}
             />
             <Button
-                title="Login"
-                onPress={getDevices}
+                title="Go to Test"
+                onPress={() => navigation.navigate('Test')}
             />
-            <Text>{value}</Text>
+            <Button
+                title="Go to Login"
+                onPress={() => navigation.navigate('LoginScreen')}
+            />
         </View>
     );
 }
