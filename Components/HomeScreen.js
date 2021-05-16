@@ -1,86 +1,112 @@
 import React from 'react';
-import { Button, FlatList, Image, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
-import films from '../Data/Data';
+import { Image, StyleSheet, Text, View, SafeAreaView, TouchableHighlight, ScrollView, StatusBar } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const filmItem = (item) => (
-    <View style={styles.films_container}>
+class HomeScreen extends React.Component {
 
-        <Image style={styles.image_container} source={{ uri: item.poster_uri }} />
 
-        <View style={styles.films_header_container}>
-            <View style={styles.films_title}>
-                <Text style={{ flex: 6, paddingRight: 5 }}>{item.title}</Text>
-                <Text style={{ flex: 1, textAlign: 'right' }}>{item.vote_average}</Text>
-            </View>
-            <Text style={styles.films_description} numberOfLines={5}>{item.overview}</Text>
-            <Text style={styles.films_date}>{item.release_date}</Text>
-        </View>
-    </View >
-);
+    state = {
+        devices: [],
+        token: ''
+    }
 
-function HomeScreen({ navigation }) {
-    return (
-        <SafeAreaView style={styles.main_container}>
-            <FlatList
-                data={films}
-                renderItem={({ item }) => filmItem(item)}
-                keyExtractor={(item) => item.id.toString()}
+    componentDidMount = async () => {
+        //const navigation = useNavigation();
+        const { navigation } = this.props;
+        console.log("test")
+        try {
+            const token = await AsyncStorage.getItem('user_token');
+            console.log("data")
+            if (token !== null) {
+                console.log("data receved")
+                console.log(token)
+                this.setState({ token });
+                this.get_devices(token)
+                // We have data!!
+            }
+            else {
+                console.log("empty data")
+                navigation.navigate('NavigScreen')
+            }
+        } catch (error) {
+            // Error retrieving data
+            console.log("fail")
+            navigation.navigate('NavigScreen')
+        }
+    };
 
-            />
-        </SafeAreaView >
-    );
+
+    get_devices(user_token) {
+        axios.get(`http://senard.freeboxos.fr:4000/client/${user_token}/list_devices`)
+            .then(responce => {
+                const devices = responce.data;
+                this.setState({ devices });
+            })
+    }
+
+    devicebox(props) {
+        const navigation = useNavigation();
+        let sourceimg = ''
+        let color_container = ''
+        if (props.type == "terra") {
+            sourceimg = require('../assets/terrarium.png');
+            color_container = '#713931'
+        }
+        else {
+            sourceimg = require('../assets/error.png');
+            color_container = '#262626'
+        }
+        return (
+            <TouchableHighlight onPress={() => navigation.navigate('Test')} underlayColor="white">
+                <View style={[styles.device_container, { backgroundColor: color_container }]}>
+                    <Image style={styles.image} source={sourceimg} resizeMode="contain" />
+                </View>
+            </TouchableHighlight >
+        );
+    }
+
+
+    render() {
+        let user_token = ''
+        const { route } = this.props;
+        //const { token } = route.params;
+        /* user_token = this.state.token
+        this.get_devices(user_token) */
+        return (
+            <SafeAreaView style={styles.container}>
+                <ScrollView style={styles.scrollView}>
+                    {this.state.devices.map(device => <this.devicebox key={device.id} type={device.type} />)}
+                </ScrollView>
+            </SafeAreaView>
+        )
+    }
 }
 
-
-
 const styles = StyleSheet.create({
-    main_container: {
+    container: {
         flex: 1,
-        backgroundColor: '#ffffff',
-        marginTop: 30,
-        color: '#000000',
+        paddingTop: StatusBar.currentHeight,
     },
+    scrollView: {
 
-    films_container: {
-        height: 180,
-        margin: 10,
-        flex: 1,
-        flexDirection: 'row',
-        //backgroundColor: 'yellow'
     },
-
-    image_container: {
-        width: 120,
-        height: 180,
-        //backgroundColor: 'blue'
+    text: {
+        fontSize: 42,
     },
-
-    films_header_container: {
-        margin: 5,
-        flex: 1,
-        //backgroundColor: 'gray',
+    device_container: {
+        height: 200,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: 15,
     },
-
-    films_title: {
-        flex: 1,
-        flexDirection: 'row',
-        //backgroundColor: 'purple',
-    },
-
-    films_description: {
-        flex: 3,
-    },
-
-    films_date: {
-        flex: 1,
-        textAlign: 'right',
-        //backgroundColor: 'red',
-    },
+    image: {
+        width: '90%',
+    }
 });
-
-
-
 
 
 export default HomeScreen

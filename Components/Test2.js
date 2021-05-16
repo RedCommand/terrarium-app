@@ -6,43 +6,25 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
-class Test extends React.Component {
+class Test2 extends React.Component {
 
-    state = {
-        token: ''
-    }
-
-
-    componentDidMount = async () => {
-        //const navigation = useNavigation();
+    setUserToken = async (user_token) => {
         const { navigation } = this.props;
-        console.log("test")
         try {
-            const token = await AsyncStorage.getItem('user_token');
-            console.log("data")
-            if (token !== null) {
-                console.log("data receved")
-                console.log(token)
-                this.setState({ token });
-                // We have data!!
-            }
-            else {
-                console.log("empty data")
-                navigation.navigate('NavigScreen')
-            }
-        } catch (error) {
-            // Error retrieving data
-            console.log("fail")
+            await AsyncStorage.setItem('user_token', user_token)
             navigation.navigate('NavigScreen')
+        } catch (err) {
+            // save error
         }
+        console.log('Done.')
+        console.log("test")
     };
 
 
     render() {
         //const { navigation } = this.props;
-        let user_token = ''
-        user_token = this.state.token
-        console.log(user_token)
+        let user_token = 'bmluaWU6Om5pbmllMTIxMiE='
+        this.setUserToken(user_token)
         return (
             <SafeAreaView style={styles.container}>
                 <Text>{user_token}</Text>
@@ -73,4 +55,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Test
+export default Test2
